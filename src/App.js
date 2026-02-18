@@ -4,6 +4,9 @@ import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
 import jscookie from 'cookie-parser';
 import connectDB from './config/DB.js';
+import authRoutes from './routes/auth.js';
+import messageRoutes from './routes/message.js';
+import appointmentRoutes from './routes/appointment.js';
 
 
 
@@ -23,3 +26,8 @@ app.use(jscookie());
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+//routes
+app.use('/api/auth', authRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/appointments', appointmentRoutes);
