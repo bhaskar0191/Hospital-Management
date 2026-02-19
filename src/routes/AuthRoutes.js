@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import authMiddleware from "../middleware/AuthMiddleware.js"
+import cookies from "cookie-parser";
 
 const router = express.Router();
 
@@ -25,6 +26,14 @@ router.post('/register', async (req, res) => {
                specialization
           });
             await newUser.save();
+            const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+            res.cookie("token", token, { 
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });    
+        
             res.status(201).json({ success: true, message: "Doctor registered successfully." });
         } catch (error) {
           res.status(500).json({ success: false, message: "Error registering doctor.", error });
@@ -46,6 +55,12 @@ router.post('/register', async (req, res) => {
           });
             await newUser.save();
             const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+             res.cookie("token", token, { 
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
             res.status(201).json({ success: true, message: "User registered successfully.", token });
         }
         catch (error) {
@@ -67,6 +82,12 @@ router.post('/login', async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid password." });
         }
         const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+         res.cookie("token", token, { 
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production', 
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'Strict',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
         res.json({ success: true, token, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
     } catch (error) {
         res.status(500).json({ success: false, message: "Error logging in.", error });
@@ -74,8 +95,11 @@ router.post('/login', async (req, res) => {
 });
 // Get user profile
 router.get('/profile', authMiddleware, async (req, res) => {
-    const {userId} = req.body
-    try {
+   const userId = req.user?.id;
+   if (!userId) {
+            return res.status(404).json({ message: "User  ID not found." });
+        }
+    try {  
         const user = await User.findById(userId).select('-password');
         if (!user) {
             return res.status(404).json({ message: "User not found." });
