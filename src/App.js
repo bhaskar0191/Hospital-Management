@@ -28,6 +28,6 @@ app.listen(PORT, () => {
 });
 
 //routes
-app.use('/api/auth', authRoutes);
-app.use('/api/messages', messageRoutes);
-app.use('/api/appointments', appointmentRoutes);
+app.use('/auth', authRoutes);
+app.use('/messages', messageRoutes);
+app.use('/appointments', appointmentRoutes);

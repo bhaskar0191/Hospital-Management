@@ -8,27 +8,8 @@ const router = express.Router();
 
 // Register a new user
 router.post('/register', async (req, res) => {
-    if (req.body.role !== 'doctor' && req.body.specialization === undefined) {
-         const { name, email, password} = req.body;
-         try {
-            const existingUser = await User.findOne({ email });
-            if (existingUser) {
-            return res.status(400).json({ message: "User already exists." });
-            }
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = new User({
-               name,
-               email,
-               password: hashedPassword
-          });
-            await newUser.save();
-            res.status(201).json({ success: true, message: "User registered successfully." });
-        } catch (error) {
-          res.status(500).json({ success: false, message: "Error registering user.", error });
-       }
-      
-    }
-    else{
+    if(req.body.role === "doctor"){
+   
         const { name, email, password, role, specialization } = req.body;
         try {
             const existingUser = await User.findOne({ email });
@@ -49,7 +30,28 @@ router.post('/register', async (req, res) => {
           res.status(500).json({ success: false, message: "Error registering doctor.", error });
        }
       
-    };
+    }else{
+        const { name, email, password, role } = req.body;
+        try {
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+            return res.status(400).json({ success: false, message: "User already exists." });
+            }
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = new User({
+               name,
+               email,
+               password: hashedPassword,
+               role
+          });
+            await newUser.save();
+            const token = jwt.sign({ id: newUser._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+            res.status(201).json({ success: true, message: "User registered successfully.", token });
+        }
+        catch (error) {
+          res.status(500).json({ success: false, message: "Error registering user.", error });
+       }
+    }
    
 });
 // Login user
@@ -72,8 +74,9 @@ router.post('/login', async (req, res) => {
 });
 // Get user profile
 router.get('/profile', authMiddleware, async (req, res) => {
+    const {userId} = req.body
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findById(userId).select('-password');
         if (!user) {
             return res.status(404).json({ message: "User not found." });
         }
@@ -83,7 +86,7 @@ router.get('/profile', authMiddleware, async (req, res) => {
     }
 });
 //get all doctors
-router.get('/doctors', async (req, res) => {
+router.get('/alldoctors', async (req, res) => {
     try {
         const doctors = await User.find({ role: "doctor" }).select('-password');
         res.json({ success: true, doctors });
