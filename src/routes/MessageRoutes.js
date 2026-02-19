@@ -5,9 +5,14 @@ import authMiddleware from '../middleware/AuthMiddleware.js';
 const router = express.Router();
 
 router.post('/send', authMiddleware, async (req, res) => {
-    const { senderId, receiverId, content } = req.body;
+    const { receiverId, content } = req.body;
     try {
-        const message = await Messages.sendMessage(senderId, receiverId, content);
+        const message =  new Messages({
+            sender: req.user._id, 
+            receiver: receiverId,
+             content 
+        });
+        await message.save();
         res.status(201).json(message);
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -19,7 +24,7 @@ router.get('/conversations/:userId1/:userId2', authMiddleware, async (req, res) 
     try {
         const conversation = await Messages.getConversation(userId1, userId2);
         res.status(200).json(conversation);
-    } catch (error) {        res.status(500).json({ error: error.message });
+    } catch (error) { res.status(500).json({ error: error.message });
     }
 });
 
