@@ -1,10 +1,8 @@
 import express from 'express';
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { authMiddleware } from "../middleware/AuthMiddleware.js";
-
-const express = require('express');
+import authMiddleware from "../middleware/AuthMiddleware.js"
 
 const router = express.Router();
 
@@ -104,4 +102,4 @@ router.get('/doctors/specialization/:specialization', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

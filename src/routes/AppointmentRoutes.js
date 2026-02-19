@@ -1,6 +1,6 @@
 import express from 'express';
-import appoinmemts from '../controllers/AppointmentController.js';
-import authMiddleware from '../middleware/authMiddleware.js';
+import Appoinmemts from '../models/Appointment.js';
+import authMiddleware from '../middleware/AuthMiddleware.js';
 
 const router = express.Router();
 
@@ -11,9 +11,9 @@ router.post('/create', authMiddleware, async (req, res) => {
         if (req.user.role !== 'patient') {
             return res.status(403).json({ message: "Only patients can create appointments." });
         }
-        const appointment = await appoinmemts.createAppointment({
+        const appointment = await Appoinmemts.createAppointment({
             doctorId, 
-            patient: req.user._id,
+            patientId,
             date, 
             time,
             reson,
@@ -24,3 +24,5 @@ router.post('/create', authMiddleware, async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+export default router;

@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import  User  from '../models/User.js';
 
-export const authMiddleware = async (req, res, next) => {
+const authMiddleware = async (req, res, next) => {
     let token = req.headers.authorization?.split(' ')[1];
     if (!token) {
         return res.status(401).json({ message: "Access denied. No token provided." });
@@ -15,4 +15,4 @@ export const authMiddleware = async (req, res, next) => {
         res.status(401).json({ message: "Invalid token." });
     }
 }
-module.exports = authMiddleware;
+export default authMiddleware;
