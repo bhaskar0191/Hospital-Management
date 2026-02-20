@@ -21,7 +21,6 @@ router.post('/send', authMiddleware, async (req, res) => {
 // Get messages between two users
 router.get('/conversations/', authMiddleware, async (req, res) => {
     const { userId1, userId2 } = req.query;
-    console.log('Fetching messages between:', userId1, 'and', userId2);
     try {
         const messages = await Messages.find({
             $or: [
