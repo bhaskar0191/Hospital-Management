@@ -15,11 +15,16 @@ const appointmentSchema = new mongoose.Schema({
         type: Date,
         required: true 
     },
+    reason: {
+        type: String,
+        required: true
+    },
     status: {
         type: String,
         enum: ['scheduled', 'completed', 'cancelled'],
         default: 'scheduled'
     }
-})
+
+}, { timestamps: true })
 const Appointment = mongoose.model("Appointment", appointmentSchema);
 export default Appointment;

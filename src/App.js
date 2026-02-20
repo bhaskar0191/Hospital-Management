@@ -30,4 +30,4 @@ app.listen(PORT, () => {
 //routes
 app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
-app.use('/appointments', appointmentRoutes);
+app.use('/appointment', appointmentRoutes);
